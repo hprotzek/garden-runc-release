@@ -1,0 +1,21 @@
+#!/bin/bash
+
+<% if p("garden.listen_network") == "tcp" -%>
+  curl_command="<%= p("garden.listen_address") %>/ping"
+<% else -%>
+  curl_command="--unix-socket <%= p("garden.listen_address") %> http:/ping"
+<% end -%>
+
+ping_garden_server() {
+  while true; do
+    if curl -s $curl_command ; then
+      echo 'garden server is running'
+      return 0
+    else
+      echo 'pinging garden server...'
+    fi
+    sleep 0.1
+  done
+}
+
+timeout 60 sh -c "ping_garden_server"
